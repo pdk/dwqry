@@ -22,9 +22,11 @@ drop table if exists date_dim;
 
 create table date_dim (
     date_dim_id bigserial not null primary key,
+    year_number numeric(4) not null,
     date_value date not null,
     month_number numeric(2) not null,
     month_name text not null,
+    day_number numeric(2) not null,
     is_week_day boolean not null,
     is_holiday boolean not null,
     is_last_day_of_month boolean not null
@@ -32,16 +34,20 @@ create table date_dim (
 
 insert into date_dim (
     date_value,
+    year_number,
     month_number,
     month_name,
+    day_number,
     is_week_day,
     is_holiday,
     is_last_day_of_month
 )
 select
   d.cur_date as date_value,
+  extract(year from d.cur_date) as year_number,
   extract(month from d.cur_date) as month_number,
   to_char(d.cur_date, 'Mon') as month_name,
+  extract(day from d.cur_date) as day_number,
   case
     when extract(isodow from d.cur_date) between 2 and 5
     then true
@@ -67,7 +73,7 @@ create table country_region_map (
     north_south text
 );
 
-copy country_region_map from '/Users/pkelly/presentations/dwqry/country-region-map.csv' delimiter ',' csv header;
+copy country_region_map from '/Users/pkelly/home-stuff/src/dwqry/country-region-map.csv' delimiter ',' csv header;
 
 create table load_accounts (
     Account_ID text,
@@ -80,7 +86,7 @@ create table load_accounts (
     City text
 );
 
-copy load_accounts from '/Users/pkelly/presentations/dwqry/accounts.csv' delimiter ',' csv header;
+copy load_accounts from '/Users/pkelly/home-stuff/src/dwqry/accounts.csv' delimiter ',' csv header;
 
 create table load_products (
     Product_ID text,
@@ -89,7 +95,7 @@ create table load_products (
     Shipping_Weight numeric
 );
 
-copy load_products from '/Users/pkelly/presentations/dwqry/products.csv' delimiter ',' csv header;
+copy load_products from '/Users/pkelly/home-stuff/src/dwqry/products.csv' delimiter ',' csv header;
 
 create table load_salespeople (
     Salesperson_ID text,
@@ -99,7 +105,7 @@ create table load_salespeople (
     Job_Title text
 );
 
-copy load_salespeople from '/Users/pkelly/presentations/dwqry/salespeople.csv' delimiter ',' csv header;
+copy load_salespeople from '/Users/pkelly/home-stuff/src/dwqry/salespeople.csv' delimiter ',' csv header;
 
 create table load_invoices (
     Invoice_Number numeric,
@@ -108,7 +114,7 @@ create table load_invoices (
     Salesperson_ID text
 );
 
-copy load_invoices from '/Users/pkelly/presentations/dwqry/invoices.csv' delimiter ',' csv header;
+copy load_invoices from '/Users/pkelly/home-stuff/src/dwqry/invoices.csv' delimiter ',' csv header;
 
 create table load_invoice_items (
     Invoice_Number numeric,
@@ -117,7 +123,7 @@ create table load_invoice_items (
     Sale_Price numeric
 );
 
-copy load_invoice_items from '/Users/pkelly/presentations/dwqry/invoice-items.csv' delimiter ',' csv header;
+copy load_invoice_items from '/Users/pkelly/home-stuff/src/dwqry/invoice-items.csv' delimiter ',' csv header;
 
 create table invoice_dim (
     invoice_dim_id bigserial not null primary key,
